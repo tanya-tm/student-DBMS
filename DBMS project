@@ -1,0 +1,187 @@
+//student database management system 
+#include<iostream>
+#include<stdio.h>
+#include<string.h>
+#include<stdlib.h>
+#include<conio.h>
+#include<iomanip>
+using namespace std;
+
+main()
+{
+	FILE*fp,*ft;
+	
+    //students information: 
+	struct student
+	{
+		char name[50];  
+	    char regno[6]; 
+	    int rollno;     
+	    char branch[20]; 
+	    char div[5];   
+	    char address[50]; 
+	    char phn[15];  
+	};
+    //variable declaration	
+	struct student s;
+	char xname[50];
+	long int size;
+	fp=fopen("user.txt","rb+");
+	if(fp==NULL)
+	{
+		fp=fopen("user.txt","wb+");
+		
+		if(fp==NULL)
+		{
+			cout<<"\n\t\t cannot open file!";
+			return 0;
+		}
+	}
+	
+    size = sizeof(s); //size of struct student s
+    int ch;
+    char another;
+    while(1) 
+    {
+    	system("cls");
+    	cout<<"\n\n\t\t-------STUDENTS DATABASE MANAGEMENT SYSTEM------- ";
+    	//menu control for user
+    	cout<<"\n\t\t1.Add details ";
+    	cout<<"\n\t\t2.List details ";
+    	cout<<"\n\t\t3.Modify details ";
+    	cout<<"\n\t\t4.Delete details ";
+    	cout<<"\n\t\t5.Exit ";
+    	//input user's choice
+    	cout<<"\n\n\t\t Enter your choice--->";
+    	cin>>ch;
+    	
+    	switch(ch) //switch case
+    	{
+    		case 1: 
+    		       fseek(fp,0,SEEK_END);
+    		       another='Y';
+    		       //adds details of student to database
+    		       while(another=='y'||another=='Y')
+    		       {
+    		       	system("cls");
+    		       	cout<<"\n\t\tEnter students name: ";
+    		       	fflush(stdin);
+    		       	cin.getline(s.name,50);
+    		       	cout<<"\n\t\tEnter 5 digit registration number: ";
+    		       	cin>>s.regno;
+    		       	cout<<"\n\t\tRoll no.: ";
+    		       	cin>>s.rollno;
+    		       	cout<<"\n\t\tBranch: ";
+    		       	fflush(stdin);
+    		       	cin.getline(s.branch,20);
+    		       	cout<<"\n\t\tDivision: ";
+    		       	cin>>s.div;
+    		       	cout<<"\n\t\tPermanent Address: ";
+    		       	fflush(stdin);
+    		       	cin.getline(s.address,50);
+    		       	cout<<"\n\t\tPhone number: ";
+    		       	cin>>s.phn;
+    		       	
+    		       	fwrite(&s,size,1,fp);
+    		       	cout<<"\n\t\tDo you want to add another record?(Y/N)";
+    		       	cin>>another;
+				   }
+				   break;
+	        case 2: 
+	               system("cls");
+	               rewind(fp);
+	               cout<<"\n\t\t-------STUDENT DETAILS-------";
+	               // lists students details from the database 
+	               while(fread(&s,size,1,fp)==1)
+	               {
+	               	cout<<"\n\n\t\tName: "<<s.name;
+	               	cout<<"\n\t\tRoll no.: "<<s.rollno;
+	               	cout<<"\n\t\tRegistration number: "<<s.regno;
+	               	cout<<"\n\t\tBranch: "<<s.branch;
+	               	cout<<"\n\t\tDivision: "<<s.div;
+	               	cout<<"\n\t\tPhone number: "<<s.phn;
+	               	cout<<"\n\t\tAddress: "<<s.address;
+				   }
+				   cout<<"\n\n";
+				   system("pause");
+				   break;
+			case 3: 
+			       system("cls");
+			       another='Y';
+			       //edit students details from the database 
+			       cout<"\n\n\t\t------EDIT STUDENT DETAILS------";
+			       while(another=='y'||another=='Y')
+			       {
+			       	cout<<"\n\n\t\tEnter the name of the student: ";
+			       	fflush(stdin);
+			       	cin.getline(xname,50);
+			       	
+			       	rewind(fp);
+			       	while(fread(&s,size,1,fp)==1)
+			       	{
+			       	  if(strcmp(s.name,xname)==0)
+						 {
+						 	cout<<"\n\n\t\tPLEASE RE-ENTER FOLLOWING INFORMATION--->";
+						 	cout<<"\n\t\tStudent's Name:  ";
+						 	fflush(stdin);
+						 	cin.getline(s.name,50);
+						 	cout<<"\n\t\tRegistration number: ";
+						 	cin>>s.regno;
+						 	cout<<"\n\t\tRoll no: ";
+						 	cin>>s.rollno;
+						 	cout<<"\n\t\tBranch: ";
+						 	fflush(stdin);
+						 	cin.getline(s.branch,20);
+						 	cout<<"\n\t\tDivision: ";
+						 	cin>>s.div;
+						 	cout<<"\n\t\tAddress: ";
+						 	fflush(stdin);
+						 	cin.getline(s.address,50);
+						 	cout<<"\n\t\tPhone number: ";
+						 	cin>>s.phn;
+						 	fseek(fp,-size,SEEK_CUR);
+						 	fwrite(&s,size,1,fp);
+						 	break;
+						 }
+					}
+		            cout<<"\n\n\t\tDo you want to modify another record?(Y/N): ";
+		            cin>>another;
+			       }
+			       break;
+			       case 4: 
+			              system("cls");
+			              another='Y';
+			              //delete students details from the database 
+			              while(another=='y'||another=='Y')
+			              {
+						  
+			              	cout<<"\n\n\t\tEnter the name of student to delete: ";
+			              	gets(xname);
+			              	
+			              	ft=fopen("temp.dat","wb+");
+			              	rewind(fp);
+			              	while(fread(&s,size,1,fp)==1)
+			              	{
+			              		if(strcmp(s.name,xname)!=0)
+			              		{
+			              			fwrite(&s,size,1,ft);
+								}
+								fclose(fp);
+								fclose(ft);
+								remove("users.txt");
+								rename("temp.dat","user.txt");
+								fp=fopen("user.txt","rb+");
+						    }
+								cout<<"\n\t\tDELETED SUCCESSFULLY!!";
+								cout<<"\n\t\tDo you want to delete another record? (Y/N): ";
+								fflush(stdin);
+								cin>>another;
+						    
+					      }
+						  break;
+						case 5: exit(0);
+						default:cout<<"\n\t\tINVALID RESPONSE!!";
+		}
+	}
+	return 0;
+}
